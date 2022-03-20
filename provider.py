@@ -25,9 +25,10 @@ def shuffle_data(data, labels):
         Return:
           shuffled data, label and shuffle indices
     """
-    idx = np.arange(len(labels))
+    rows=labels.shape[0]   #to get the number of objects in each databatch
+    idx = np.arange(rows)
     np.random.shuffle(idx)
-    return data[idx, ...], labels[idx], idx
+    return data[idx, ...], labels[idx, ...], idx
 
 
 def rotate_point_cloud(batch_data):

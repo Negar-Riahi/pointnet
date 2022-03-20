@@ -180,7 +180,8 @@ def train_one_epoch(sess, ops, train_writer):
         log_string('----' + str(fn) + '-----')
         current_data, current_label = provider.loadDataFile(TRAIN_FILES[train_file_idxs[fn]])
         current_data = current_data[:,0:NUM_POINT,:]
-        current_data, current_label, _ = provider.shuffle_data(current_data, np.squeeze(current_label))            
+        current_label= current_label[:,0:3]
+        current_data, current_label, _ = provider.shuffle_data(current_data, current_label)            
         current_label = np.squeeze(current_label)
         
         file_size = current_data.shape[0]
