@@ -11,7 +11,7 @@ from transform_nets import input_transform_net, feature_transform_net
 
 def placeholder_inputs(batch_size, num_point):
     pointclouds_pl = tf.placeholder(tf.float32, shape=(batch_size, num_point, 3))
-    labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
+    labels_pl = tf.placeholder(tf.int32, shape=(batch_size,3))                  ###
     return pointclouds_pl, labels_pl
 
 
@@ -67,7 +67,7 @@ def get_model(point_cloud, is_training, bn_decay=None):
                                   scope='fc2', bn_decay=bn_decay)
     net = tf_util.dropout(net, keep_prob=0.7, is_training=is_training,
                           scope='dp2')
-    net = tf_util.fully_connected(net, 40, activation_fn=None, scope='fc3')
+    net = tf_util.fully_connected(net, 3, activation_fn=None, scope='fc3')              ####
 
     return net, end_points
 
@@ -75,9 +75,11 @@ def get_model(point_cloud, is_training, bn_decay=None):
 def get_loss(pred, label, end_points, reg_weight=0.001):
     """ pred: B*NUM_CLASSES,
         label: B, """
-    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=label)
-    classify_loss = tf.reduce_mean(loss)
-    tf.summary.scalar('classify loss', classify_loss)
+    #loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=label)
+    mse = tf.keras.losses.MeanSquaredError()                                               ###
+    regression_loss=mse(pred, label).numpy()
+    #classify_loss = tf.reduce_mean(loss)
+    tf.summary.scalar('regression loss', regression_loss)
 
     # Enforce the transformation as orthogonal matrix
     transform = end_points['transform'] # BxKxK
@@ -87,7 +89,7 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
     mat_diff_loss = tf.nn.l2_loss(mat_diff) 
     tf.summary.scalar('mat loss', mat_diff_loss)
 
-    return classify_loss + mat_diff_loss * reg_weight
+    return regression_loss + mat_diff_loss * reg_weight
 
 
 if __name__=='__main__':
