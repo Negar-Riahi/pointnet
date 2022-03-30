@@ -77,7 +77,9 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
         label: B, """
     #loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=label)
     mse = tf.keras.losses.MeanSquaredError()                                               ###
-    regression_loss=mse(pred, label).numpy()
+    regression_loss=mse(pred, label)
+    regression_loss = tf.cast(regression_loss, tf.float32)
+
     #classify_loss = tf.reduce_mean(loss)
     tf.summary.scalar('regression loss', regression_loss)
 
