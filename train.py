@@ -204,7 +204,7 @@ def train_one_epoch(sess, ops, train_writer):
             rotated_data , rotated_label = provider.rotate_point_cloud(current_data[start_idx:end_idx, :, :],current_label[start_idx:end_idx ,:])
             jittered_data = provider.jitter_point_cloud(rotated_data)
             feed_dict = {ops['pointclouds_pl']: jittered_data,
-                         ops['labels_pl']: rotated_label[start_idx:end_idx,:], ##
+                         ops['labels_pl']: rotated_label, ##
                          ops['is_training_pl']: is_training,}
             summary, step, _, loss_val, pred_val = sess.run([ops['merged'], ops['step'],
                 ops['train_op'], ops['loss'], ops['pred']], feed_dict=feed_dict)
