@@ -166,8 +166,9 @@ def train():
             eval_one_epoch(sess, ops, test_writer)
             
             # Save the variables to disk.
+            save_dir='/content/drive/MyDrive/log'
             if epoch % 2 == 0:
-                save_path = saver.save(sess, os.path.join(LOG_DIR, "model.ckpt"))
+                save_path = saver.save(sess, os.path.join(save_dir, "model.ckpt"))
                 log_string("Model saved in file: %s" % save_path)
 
 
