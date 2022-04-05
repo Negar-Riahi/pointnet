@@ -11,12 +11,12 @@ from transform_nets import input_transform_net, feature_transform_net
 
 def placeholder_inputs(batch_size, num_point):
     pointclouds_pl = tf.placeholder(tf.float32, shape=(batch_size, num_point, 3))
-    labels_pl = tf.placeholder(tf.int32, shape=(batch_size,3))                  ###
+    labels_pl = tf.placeholder(tf.float32, shape=(batch_size,3))                  ###
     return pointclouds_pl, labels_pl
 
 
 def get_model(point_cloud, is_training, bn_decay=None):
-    """ Classification PointNet, input is BxNx3, output Bx40 """
+    """ Classification PointNet, input is BxNx3, output Bx3 """
     batch_size = point_cloud.get_shape()[0].value
     num_point = point_cloud.get_shape()[1].value
     end_points = {}
@@ -55,8 +55,9 @@ def get_model(point_cloud, is_training, bn_decay=None):
                          scope='conv5', bn_decay=bn_decay)
 
     # Symmetric function: max pooling
-    net = tf_util.max_pool2d(net, [num_point,1],
-                             padding='VALID', scope='maxpool')
+    # net = tf_util.max_pool2d(net, [num_point,1],
+     #                        padding='VALID', scope='maxpool')  #####
+    net = tf.reduce_max(net, axis=[1,2])
 
     net = tf.reshape(net, [batch_size, -1])
     net = tf_util.fully_connected(net, 512, bn=True, is_training=is_training,
@@ -78,7 +79,7 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
     #loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=label)
     mse = tf.keras.losses.MeanSquaredError()                                               ###
     regression_loss=mse(pred, label)
-    regression_loss = tf.cast(regression_loss, tf.float32)
+    #regression_loss = tf.cast(regression_loss, tf.float32)
 
     #classify_loss = tf.reduce_mean(loss)
     tf.summary.scalar('regression loss', regression_loss)
