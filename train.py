@@ -162,15 +162,15 @@ def train():
         for epoch in range(MAX_EPOCH):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
-             
-            train_one_epoch(sess, ops, train_writer)
-            eval_one_epoch(sess, ops, test_writer)
+            with tf.device('/gpu:'+str(GPU_INDEX)): 
+                train_one_epoch(sess, ops, train_writer)
+                eval_one_epoch(sess, ops, test_writer)
+                
+                # Save the variables to disk.
             
-            # Save the variables to disk.
-           
-            if epoch % 2 == 0:
-                save_path = saver.save(sess, os.path.join(save_dir, "model.ckpt"))
-                log_string("Model saved in file: %s" % save_path)
+                if epoch % 2 == 0:
+                    save_path = saver.save(sess, os.path.join(save_dir, "model.ckpt"))
+                    log_string("Model saved in file: %s" % save_path)
 
 
 
