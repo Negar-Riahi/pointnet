@@ -42,10 +42,11 @@ DECAY_RATE = FLAGS.decay_rate
 MODEL = importlib.import_module(FLAGS.model) # import network module
 MODEL_FILE = os.path.join(BASE_DIR, 'models', FLAGS.model+'.py')
 LOG_DIR = FLAGS.log_dir
-if not os.path.exists(LOG_DIR): os.mkdir(LOG_DIR)
-os.system('cp %s %s' % (MODEL_FILE, LOG_DIR)) # bkp of model def
-os.system('cp train.py %s' % (LOG_DIR)) # bkp of train procedure
-LOG_FOUT = open(os.path.join(LOG_DIR, 'log_train.txt'), 'w')
+save_dir='/content/drive/MyDrive/log'
+if not os.path.exists(save_dir): os.mkdir(save_dir)
+os.system('cp %s %s' % (MODEL_FILE, save_dir)) # bkp of model def
+os.system('cp train.py %s' % (save_dir)) # bkp of train procedure
+LOG_FOUT = open(os.path.join(save_dir, 'log_train.txt'), 'w')
 LOG_FOUT.write(str(FLAGS)+'\n')
 
 MAX_NUM_POINT = 2048
@@ -138,9 +139,9 @@ def train():
         # Add summary writers
         #merged = tf.merge_all_summaries()
         merged = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'),
+        train_writer = tf.summary.FileWriter(os.path.join(save_dir, 'train'),
                                   sess.graph)
-        test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'))
+        test_writer = tf.summary.FileWriter(os.path.join(save_dir, 'test'))
 
         # Init variables
         init = tf.global_variables_initializer()
@@ -166,7 +167,7 @@ def train():
             eval_one_epoch(sess, ops, test_writer)
             
             # Save the variables to disk.
-            save_dir='/content/drive/MyDrive/log'
+           
             if epoch % 2 == 0:
                 save_path = saver.save(sess, os.path.join(save_dir, "model.ckpt"))
                 log_string("Model saved in file: %s" % save_path)
