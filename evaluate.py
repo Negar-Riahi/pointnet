@@ -20,7 +20,7 @@ parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU
 parser.add_argument('--model', default='pointnet_cls', help='Model name: pointnet_cls or pointnet_cls_basic [default: pointnet_cls]')
 parser.add_argument('--batch_size', type=int, default=4, help='Batch Size during training [default: 1]')
 parser.add_argument('--num_point', type=int, default=1000, help='Point Number [256/512/1024/2048] [default: 1024]')
-parser.add_argument('--model_path', default='log2/model.ckpt', help='model checkpoint file path [default: log/model.ckpt]')
+parser.add_argument('--model_path', default='/content/drive/MyDrive/log2/model.ckpt', help='model checkpoint file path [default: log/model.ckpt]')
 parser.add_argument('--dump_dir', default='dump', help='dump folder path [dump]')
 #parser.add_argument('--visu', action='store_true', help='Whether to dump image for error case [default: False]')
 FLAGS = parser.parse_args()
@@ -140,8 +140,10 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
                 l = current_label[i]
                 #total_seen_class[l] += 1
                 #total_correct_class[l] += (pred_val[i-start_idx] == l)
-                fout.write('%d, %d\n' % (pred_val[i-start_idx], l))   # ?writes whats predicted vs what should be
-                
+                #fout.write('%d, %d\n' % (pred_val[i-start_idx], l))   # ?writes whats predicted vs what should be
+                fout.write(pred_val[i-start_idx], l)
+                fout.write('\n')
+
                # if pred_val[i-start_idx] != l and FLAGS.visu: # ERROR CASE, DUMP!
                #     img_filename = '%d_label_%s_pred_%s.jpg' % (error_cnt, SHAPE_NAMES[l],
                #                                            SHAPE_NAMES[pred_val[i-start_idx]])

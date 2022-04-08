@@ -74,6 +74,7 @@ def rotate_point_cloud_by_angle(batch_data,label_data, rotation_angle):
                                     [0, 1, 0],
                                     [-sinval, 0, cosval]])
         shape_pc = batch_data[k, ...]
+        label_pc= label_data[k,...]
         rotated_data[k, ...] = np.dot(shape_pc.reshape((-1, 3)), rotation_matrix)
         rotated_label[k, ...]= np.dot (label_pc, rotation_matrix)
 
