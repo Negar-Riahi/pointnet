@@ -56,7 +56,7 @@ def rotate_point_cloud(batch_data,label_data):
     return rotated_data ,rotated_label
 
 
-def rotate_point_cloud_by_angle(batch_data, rotation_angle):
+def rotate_point_cloud_by_angle(batch_data,label_data, rotation_angle):
     """ Rotate the point cloud along up direction with certain angle.
         Input:
           BxNx3 array, original batch of point clouds
@@ -64,6 +64,8 @@ def rotate_point_cloud_by_angle(batch_data, rotation_angle):
           BxNx3 array, rotated batch of point clouds
     """
     rotated_data = np.zeros(batch_data.shape, dtype=np.float32)
+    rotated_label= np.zeros(label_data.shape, dtype=np.float32)
+
     for k in range(batch_data.shape[0]):
         #rotation_angle = np.random.uniform() * 2 * np.pi
         cosval = np.cos(rotation_angle)
@@ -73,7 +75,9 @@ def rotate_point_cloud_by_angle(batch_data, rotation_angle):
                                     [-sinval, 0, cosval]])
         shape_pc = batch_data[k, ...]
         rotated_data[k, ...] = np.dot(shape_pc.reshape((-1, 3)), rotation_matrix)
-    return rotated_data
+        rotated_label[k, ...]= np.dot (label_pc, rotation_matrix)
+
+    return rotated_data,rotated_label
 
 
 def jitter_point_cloud(batch_data, sigma=0.01, clip=0.05):
