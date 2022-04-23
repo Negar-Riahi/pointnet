@@ -41,8 +41,10 @@ HOSTNAME = socket.gethostname()
 
 # ModelNet40 official train/test split
 TRAIN_FILES = provider.getDataFiles('/content/drive/MyDrive/data/train_files.txt')
-TEST_FILES = provider.getDataFiles('/content/drive/MyDrive/data/test_files.txt')
+#TEST_FILES = provider.getDataFiles('/content/drive/MyDrive/data/test_files.txt')
 
+#KIT database (64 objects)
+TEST_FILES = provider.getDataFiles('/content/drive/MyDrive/data/test_files_KIT.txt')
 
 def log_string(out_str):
     LOG_FOUT.write(out_str+'\n')
@@ -113,10 +115,10 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
             #batch_pred_sum = np.zeros((cur_batch_size, NUM_CLASSES)) # score for classes
             #batch_pred_classes = np.zeros((cur_batch_size, NUM_CLASSES)) # 0/1 for classes
             for vote_idx in range(num_votes):
-                rotated_data,rotated_label = provider.rotate_point_cloud_by_angle(current_data[start_idx:end_idx, :, :],current_label[start_idx:end_idx ,:],
-                                                  vote_idx/float(num_votes) * np.pi * 2)
-                feed_dict = {ops['pointclouds_pl']: rotated_data,
-                             ops['labels_pl']: rotated_label,
+               # rotated_data,rotated_label = provider.rotate_point_cloud_by_angle(current_data[start_idx:end_idx, :, :],current_label[start_idx:end_idx ,:],
+                #                                  vote_idx/float(num_votes) * np.pi * 2)
+                feed_dict = {ops['pointclouds_pl']: current_data,
+                             ops['labels_pl']: current_label,
                              ops['is_training_pl']: is_training}
                 loss_val, pred_val = sess.run([ops['loss'], ops['pred']],
                                           feed_dict=feed_dict)
@@ -133,7 +135,7 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
             #correct = np.sum(pred_val == current_label[start_idx:end_idx])
             # correct = np.sum(pred_val_topk[:,0:topk] == label_val)
             #total_correct += correct
-            #total_seen += cur_batch_size
+            total_seen += cur_batch_size
             loss_sum += batch_loss_sum
 
             for i in range(start_idx, end_idx):
@@ -141,9 +143,9 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
                 #total_seen_class[l] += 1
                 #total_correct_class[l] += (pred_val[i-start_idx] == l)
                 #fout.write('%d, %d\n' % (pred_val[i-start_idx], l))   # ?writes whats predicted vs what should be
-                fout.write(pred_val[i-start_idx], l)
+                fout.write(str(pred_val[i-start_idx]))
+                #fout.write(str(l))
                 fout.write('\n')
-
                # if pred_val[i-start_idx] != l and FLAGS.visu: # ERROR CASE, DUMP!
                #     img_filename = '%d_label_%s_pred_%s.jpg' % (error_cnt, SHAPE_NAMES[l],
                #                                            SHAPE_NAMES[pred_val[i-start_idx]])
@@ -152,7 +154,7 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
                 #    scipy.misc.imsave(img_filename, output_img)
                 #    error_cnt += 1
                 
-    log_string('eval mean loss: %f' % (loss_sum / float(total_seen)))
+    #log_string('eval mean loss: %f' % (loss_sum / float(total_seen)))
     #log_string('eval accuracy: %f' % (total_correct / float(total_seen)))
     #log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
     
